@@ -1,0 +1,53 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+#define MAX 256
+
+// Function to build bad character table
+void badCharHeuristic(string pattern, int size, int badChar[MAX]) {
+    for (int i = 0; i < MAX; i++)
+        badChar[i] = -1;
+
+    for (int i = 0; i < size; i++)
+        badChar[(int)pattern[i]] = i;
+}
+
+// Boyer-Moore search function
+void search(string text, string pattern) {
+    int m = pattern.length();
+    int n = text.length();
+
+    int badChar[MAX];
+    badCharHeuristic(pattern, m, badChar);
+
+    int shift = 0;
+
+    while (shift <= (n - m)) {
+        int j = m - 1;
+
+        while (j >= 0 && pattern[j] == text[shift + j])
+            j--;
+
+        if (j < 0) {
+            cout << "Pattern found at index: " << shift << endl;
+            shift += (shift + m < n) ? m - badChar[text[shift + m]] : 1;
+        } else {
+            shift += max(1, j - badChar[text[shift + j]]);
+        }
+    }
+}
+
+int main() {
+    string text, pattern;
+
+    cout << "Enter text: ";
+    cin >> text;
+
+    cout << "Enter pattern: ";
+    cin >> pattern;
+
+    search(text, pattern);
+
+    return 0;
+}
